@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>576</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>UsEXHelper</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>541</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri Light</family>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Информация о компьютере</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="current_moment">
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>30</y>
+      <width>771</width>
+      <height>411</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="confButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>440</y>
+      <width>121</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Создать
+ конфигурационный
+файл</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="monitorButton">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>440</y>
+      <width>111</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Запустить
+мониторинг</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="installButton">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>440</y>
+      <width>111</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Скачать список
+необходимых
+программ</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="currentButton">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>440</y>
+      <width>131</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Показать информацию
+о текущем компьютере</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="tools">
+    <property name="title">
+     <string>Инструменты</string>
+    </property>
+    <addaction name="Smart"/>
+   </widget>
+   <widget class="QMenu" name="open">
+    <property name="title">
+     <string>Открыть</string>
+    </property>
+    <addaction name="monitor"/>
+    <addaction name="conf"/>
+   </widget>
+   <addaction name="tools"/>
+   <addaction name="open"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="monitor">
+   <property name="text">
+    <string>Файл мониторинга</string>
+   </property>
+  </action>
+  <action name="conf">
+   <property name="text">
+    <string>Файл конфигурации</string>
+   </property>
+  </action>
+  <action name="Smart">
+   <property name="text">
+    <string>Анализ жестких дисков</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
