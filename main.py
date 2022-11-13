@@ -15,7 +15,7 @@ import psutil
 import platform
 from PyQt5 import uic  # Импортируем uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMessageBox, QFileDialog, QInputDialog, QDialog, \
-    QCheckBox
+    QCheckBox, QButtonGroup
 from main_us_ex import Ui_MainWindow
 from monitoring import Monitoring
 from result_monitoring import Ui_Form
@@ -86,7 +86,7 @@ class Helper(QMainWindow, Ui_MainWindow):
                            'Объем кэша третьего уровня: ' + str(proc_l3) + ' КБ',
                            '',
                            'Видеокарта: ' + gpu_name,
-                           'Объем памяти видеокарты: ' + str(gpu_memory),
+                           # 'Объем памяти видеокарты: ' + str(gpu_memory),
                            "Разрешение экрана: " + monitor_resolution,
                            '',
                            'Объём оперативной памяти: ' + str(system_ram) + " ГБ",
@@ -180,27 +180,41 @@ class ShowingMonitoring(QWidget, Ui_Form):
         super().__init__()
         self.setupUi(self)
         self.db_name = db_name
-        self.dateButtonGroup.event.connect(self.give_us_a_look)
-        self.give_us_a_look()
         self.cbx = []
+        self.swap_data()
+        self.dateButtonGroup.buttonClicked.connect(self.show_data)
 
-    def give_us_a_look(self):
+    def swap_data(self):
+        self.dateButtonGroup = QButtonGroup(self)
         con = sqlite3.connect(self.db_name)
         cur = con.cursor()
-        dates = cur.execute('SELECT * FROM monitoring_ids').fetchall()
-        dates = [(1, '1023'), (2, '320')]
-        for i, date in dates:
+        self.dates = cur.execute('SELECT * FROM monitoring_ids').fetchall()
+        # self.dates = [(1, '1023'), (2, '320')]
+        for i, date in self.dates:
             self.cbx.append(QCheckBox(self).setText(date))
             self.horizontalLayout.addItem(self.cbx[-1])
+            self.dateButtonGroup.addButton(self.cbx[-1])
 
-        CPU_temperatures = cur.execute('''SELECT * FROM CPU''').fetchall()
-        GPU_temperatures = cur.execute('''SELECT * FROM GPU''').fetchall()
+        self.CPU_temperatures = cur.execute('''SELECT * FROM CPU''').fetchall()
+        self.GPU_temperatures = cur.execute('''SELECT * FROM GPU''').fetchall()
+        con.close()
 
-        cpu_graphic = [per[1] for per in CPU_temperatures]
-        gpu_graphic = [per[1] for per in GPU_temperatures]
+    def show_data(self):
+        con = sqlite3.connect(self.db_name)
+        cur = con.cursor()
+        name = self.sender()
+        CPU_temperatures = cur.execute('SELECT second, temperature FROM CPU WHERE'
+                                       ' mon_id = (SELECT id FROM monitoring_ids'
+                                       ' WHERE timestamp = ?)', (name,)).fetchall()
+        GPU_temperatures = cur.execute('SELECT second, temperature FROM GPU WHERE'
+                                       ' mon_id = (SELECT id FROM monitoring_ids'
+                                       ' WHERE timestamp = ?)', (name,)).fetchall()
 
-        self.CPU_graphicsView.plot([i for i in range(len(cpu_graphic))], cpu_graphic)
-        self.GPU_graphicsView.plot([i for i in range(len(gpu_graphic))], gpu_graphic)
+        self.CPU_graphicsView.addLegend()
+        self.GPU_graphicsView.addLegend()
+
+        self.CPU_graphicsView.plot([i for i in range(len(CPU_temperatures))], CPU_temperatures, pen='r', name=name)
+        self.GPU_graphicsView.plot([i for i in range(len(GPU_temperatures))], CPU_temperatures, pen='r', name=name)
 
         con.close()
 

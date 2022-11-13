@@ -41,8 +41,8 @@ class Monitoring(QWidget, Ui_Form):
     def update_data(self):
         self.CPU_graphicsView.clear()
         self.GPU_graphicsView.clear()
-        self.CPU_graphicsView.plot([i for i in range(len(self.cpu_graphic))], self.cpu_graphic, pen='g')
-        self.GPU_graphicsView.plot([i for i in range(len(self.gpu_graphic))], self.gpu_graphic, pen='r')
+        self.CPU_graphicsView.plot([i for i in range(len(self.cpu_graphic))], self.cpu_graphic, pen='g', symbol='x')
+        self.GPU_graphicsView.plot([i for i in range(len(self.gpu_graphic))], self.gpu_graphic, pen='r', symbol='x')
 
     def save_data(self):
         t = str(datetime.datetime.now())

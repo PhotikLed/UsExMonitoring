@@ -25,9 +25,10 @@ def init_db():
         """)
 
 
-def add_monitoring(time, cpu, gpu):
+def add_monitoring(time: str, cpu, gpu):
     con = sqlite3.connect(DB_NAME)
     cur = con.cursor()
+    time = ':'.join(time.split(':')[:2])
     cur.execute('INSERT INTO monitoring_ids (timestamp) VALUES (?)', (time,))
     id = cur.execute('SELECT * FROM monitoring_ids WHERE timestamp = ?', (time,)).fetchone()[0]
     print(id)
