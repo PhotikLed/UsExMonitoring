@@ -1,3 +1,4 @@
+import datetime
 import time
 
 import schedule
@@ -44,7 +45,7 @@ class Monitoring(QWidget, Ui_Form):
         self.GPU_graphicsView.plot([i for i in range(len(self.gpu_graphic))], self.gpu_graphic, pen='r')
 
     def save_data(self):
-        t = time.time()
+        t = str(datetime.datetime.now())
         add_monitoring(t, self.cpu_graphic, self.gpu_graphic)
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:

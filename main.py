@@ -32,8 +32,7 @@ class Helper(QMainWindow, Ui_MainWindow):
         self.currentButton.clicked.connect(self.show_current_cond)
         self.confButton.clicked.connect(self.write_configuration)
         self.installButton.clicked.connect(self.download_user_programs)
-        self.monitorButton.clicked.connect(self.window_monitoring)
-        # self.setStyleSheet("#MainWindow{border-image:url(background.jpg)}")
+        self.monitorButton.clicked.connect(self.boost_dialog)
 
         # self.monitoringWindow = Monitoring()
 
@@ -156,6 +155,10 @@ class Helper(QMainWindow, Ui_MainWindow):
                                             'База данных (*.db);;')[0]
         ShowingMonitoring(fname)
 
+    def boost_dialog(self):
+        self.dialog = TimeDialog()
+        self.dialog.show()
+
 
 class TimeDialog(QDialog, Ui_Dialog):
     def __init__(self):
@@ -179,14 +182,16 @@ class ShowingMonitoring(QWidget, Ui_Form):
         self.db_name = db_name
         self.dateButtonGroup.event.connect(self.give_us_a_look)
         self.give_us_a_look()
+        self.cbx = []
 
     def give_us_a_look(self):
         con = sqlite3.connect(self.db_name)
         cur = con.cursor()
         dates = cur.execute('SELECT * FROM monitoring_ids').fetchall()
+        dates = [(1, '1023'), (2, '320')]
         for i, date in dates:
-            self.i = QCheckBox(self).setText(date)
-            self.horizontalLayout.addItem(self.i)
+            self.cbx.append(QCheckBox(self).setText(date))
+            self.horizontalLayout.addItem(self.cbx[-1])
 
         CPU_temperatures = cur.execute('''SELECT * FROM CPU''').fetchall()
         GPU_temperatures = cur.execute('''SELECT * FROM GPU''').fetchall()
