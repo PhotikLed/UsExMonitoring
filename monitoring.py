@@ -1,4 +1,5 @@
 import datetime
+import random
 import time
 
 import schedule
@@ -12,6 +13,7 @@ import psutil
 import wmi
 import subprocess
 import sqlite3
+import pythoncom
 
 from db import add_monitoring
 
@@ -41,8 +43,8 @@ class Monitoring(QWidget, Ui_Form):
     def update_data(self):
         self.CPU_graphicsView.clear()
         self.GPU_graphicsView.clear()
-        self.CPU_graphicsView.plot([i for i in range(len(self.cpu_graphic))], self.cpu_graphic, pen='g', symbol='x')
-        self.GPU_graphicsView.plot([i for i in range(len(self.gpu_graphic))], self.gpu_graphic, pen='r', symbol='x')
+        self.CPU_graphicsView.plot([i for i in range(len(self.cpu_graphic))], self.cpu_graphic, pen='g')
+        self.GPU_graphicsView.plot([i for i in range(len(self.gpu_graphic))], self.gpu_graphic, pen='r')
 
     def save_data(self):
         t = str(datetime.datetime.now())
@@ -60,32 +62,41 @@ class Finder(QThread):
         self.time = time
 
     def run(self):
+        # pythoncom.CoInitialize()
+        # command = r'Start-Process -WindowStyle hidden ' \
+        #           r'"C:\Users\sotka\PycharmProjects\UeXDiagnoSYS\OpenHardwareMonitor\OpenHardwareMonitor" '
+        # subprocess.Popen(command)
         print('start monitoring')
         start_time = time.time()
-        gpu_temperature = 0
-        try:
-            w = wmi.WMI(namespace="OpenHardwareMonitor")
-            temperature_infos = w.Sensor()
-            for sensor in temperature_infos:
-                print(sensor)
-                if sensor.SensorType == u'Temperature' and 'GPU' in sensor.Name:
-                    gpu_temperature = sensor.Value
-        except:
-            gpu_temperature = 0
+        # gpu_temperature = 0
+        # try:
+        #     w = wmi.WMI(namespace="OpenHardwareMonitor")
+        #     temperature_infos = w.Sensor()
+        #     for sensor in temperature_infos:
+        #         print(sensor.Name)
+        #         if sensor.SensorType == u'Temperature' and 'GPU' in sensor.Name:
+        #             gpu_temperature = sensor.Value
+        # except:
+        #     gpu_temperature = 0
 
         while time.time() - start_time < self.time:
-            cpu_temperature = []
-            w = wmi.WMI(namespace="OpenHardwareMonitor")
-            temperature_infos = w.Sensor()
-            for sensor in temperature_infos:
-                if sensor.SensorType == u'Temperature' and 'CPU Core' in sensor.Name:
-                    cpu_temperature.append(int(sensor.Value))
-            cpu_temperature = sum(cpu_temperature) // len(cpu_temperature)
+            # cpu_temperature = []
+            # w = wmi.WMI(namespace="OpenHardwareMonitor")
+            # temperature_infos = w.Sensor()
+            # for sensor in temperature_infos:
+            #     print(sensor.Name)
+            #     if sensor.SensorType == u'Temperature' and 'Core' in sensor.Name:
+            #         cpu_temperature.append(int(sensor.Value))
+            #
+            # cpu_temperature = sum(cpu_temperature) // len(cpu_temperature)
+            #
+            # if gpu_temperature:
+            #     for sensor in temperature_infos:
+            #         if sensor.SensorType == u'Temperature' and 'GPU' in sensor.Name:
+            #             gpu_temperature = int(sensor.Value)
 
-            if gpu_temperature:
-                for sensor in temperature_infos:
-                    if sensor.SensorType == u'Temperature' and 'GPU' in sensor.Name:
-                        gpu_temperature = int(sensor.Value)
+            cpu_temperature = random.randint(40, 100)
+            gpu_temperature = random.randint(40, 100)
             self.sinout.emit(cpu_temperature, gpu_temperature)
             print('emit value')
             time.sleep(1)
