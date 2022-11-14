@@ -67,23 +67,25 @@ class Finder(QThread):
             w = wmi.WMI(namespace="OpenHardwareMonitor")
             temperature_infos = w.Sensor()
             for sensor in temperature_infos:
+                print(sensor)
                 if sensor.SensorType == u'Temperature' and 'GPU' in sensor.Name:
                     gpu_temperature = sensor.Value
         except:
             gpu_temperature = 0
 
         while time.time() - start_time < self.time:
-            cpu_temperature = str(subprocess.run(r'wmic /namespace:\\root\cimv2 PATH'
-                                                 r' Win32_PerfFormattedData_Counters_ThermalZoneInformation'
-                                                 r' get Temperature',
-                                                 capture_output=True).stdout)
-            cpu_temperature = int(cpu_temperature.split()[1].lstrip('\\r\\r\\n')) - 273
+            cpu_temperature = []
+            w = wmi.WMI(namespace="OpenHardwareMonitor")
+            temperature_infos = w.Sensor()
+            for sensor in temperature_infos:
+                if sensor.SensorType == u'Temperature' and 'CPU Core' in sensor.Name:
+                    cpu_temperature.append(int(sensor.Value))
+            cpu_temperature = sum(cpu_temperature) // len(cpu_temperature)
+
             if gpu_temperature:
-                w = wmi.WMI(namespace="OpenHardwareMonitor")
-                temperature_infos = w.Sensor()
                 for sensor in temperature_infos:
                     if sensor.SensorType == u'Temperature' and 'GPU' in sensor.Name:
-                        gpu_temperature = sensor.Value
+                        gpu_temperature = int(sensor.Value)
             self.sinout.emit(cpu_temperature, gpu_temperature)
             print('emit value')
             time.sleep(1)

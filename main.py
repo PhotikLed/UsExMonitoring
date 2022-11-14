@@ -153,6 +153,7 @@ class Helper(QMainWindow, Ui_MainWindow):
     def open_monitor_dialog(self):
         fname = QFileDialog.getOpenFileName(self, 'Выберите файл мониторинга', '',
                                             'База данных (*.db);;')[0]
+        print(fname)
         ShowingMonitoring(fname)
 
     def boost_dialog(self):
@@ -181,11 +182,11 @@ class ShowingMonitoring(QWidget, Ui_Form):
         self.setupUi(self)
         self.db_name = db_name
         self.cbx = []
-        self.swap_data()
+        self.dateButtonGroup = QButtonGroup(self)
         self.dateButtonGroup.buttonClicked.connect(self.show_data)
+        self.swap_data()
 
     def swap_data(self):
-        self.dateButtonGroup = QButtonGroup(self)
         con = sqlite3.connect(self.db_name)
         cur = con.cursor()
         self.dates = cur.execute('SELECT * FROM monitoring_ids').fetchall()
@@ -194,7 +195,6 @@ class ShowingMonitoring(QWidget, Ui_Form):
             self.cbx.append(QCheckBox(self).setText(date))
             self.horizontalLayout.addItem(self.cbx[-1])
             self.dateButtonGroup.addButton(self.cbx[-1])
-
         self.CPU_temperatures = cur.execute('''SELECT * FROM CPU''').fetchall()
         self.GPU_temperatures = cur.execute('''SELECT * FROM GPU''').fetchall()
         con.close()
@@ -202,7 +202,7 @@ class ShowingMonitoring(QWidget, Ui_Form):
     def show_data(self):
         con = sqlite3.connect(self.db_name)
         cur = con.cursor()
-        name = self.sender()
+        name = self.sender().text()
         CPU_temperatures = cur.execute('SELECT second, temperature FROM CPU WHERE'
                                        ' mon_id = (SELECT id FROM monitoring_ids'
                                        ' WHERE timestamp = ?)', (name,)).fetchall()
@@ -214,7 +214,7 @@ class ShowingMonitoring(QWidget, Ui_Form):
         self.GPU_graphicsView.addLegend()
 
         self.CPU_graphicsView.plot([i for i in range(len(CPU_temperatures))], CPU_temperatures, pen='r', name=name)
-        self.GPU_graphicsView.plot([i for i in range(len(GPU_temperatures))], CPU_temperatures, pen='r', name=name)
+        self.GPU_graphicsView.plot([i for i in range(len(GPU_temperatures))], CPU_temperatures, pen='g', name=name)
 
         con.close()
 
