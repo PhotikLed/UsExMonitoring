@@ -119,12 +119,6 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="tools">
-    <property name="title">
-     <string>Инструменты</string>
-    </property>
-    <addaction name="Smart"/>
-   </widget>
    <widget class="QMenu" name="open">
     <property name="title">
      <string>Открыть</string>
@@ -132,7 +126,6 @@
     <addaction name="monitor"/>
     <addaction name="conf"/>
    </widget>
-   <addaction name="tools"/>
    <addaction name="open"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

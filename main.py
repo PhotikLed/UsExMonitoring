@@ -14,6 +14,7 @@ from types_of_DDR import types_of_DDR
 import psutil
 import platform
 from PyQt5 import uic  # Импортируем uic
+import pyqtgraph as pg
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMessageBox, QFileDialog, QInputDialog, QDialog, \
     QCheckBox, QButtonGroup
 from main_us_ex import Ui_MainWindow
@@ -154,7 +155,8 @@ class Helper(QMainWindow, Ui_MainWindow):
         fname = QFileDialog.getOpenFileName(self, 'Выберите файл мониторинга', '',
                                             'База данных (*.db);;')[0]
         print(fname)
-        ShowingMonitoring(fname)
+        self.show_mon = ShowingMonitoring(fname)
+        self.show_mon.show()
 
     def boost_dialog(self):
         self.dialog = TimeDialog()
@@ -180,41 +182,52 @@ class ShowingMonitoring(QWidget, Ui_Form):
     def __init__(self, db_name):
         super().__init__()
         self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon('icon2.png'))
         self.db_name = db_name
         self.cbx = []
         self.dateButtonGroup = QButtonGroup(self)
+        self.dateButtonGroup.setExclusive(False)
         self.dateButtonGroup.buttonClicked.connect(self.show_data)
         self.swap_data()
+
 
     def swap_data(self):
         con = sqlite3.connect(self.db_name)
         cur = con.cursor()
         self.dates = cur.execute('SELECT * FROM monitoring_ids').fetchall()
-        # self.dates = [(1, '1023'), (2, '320')]
+        print(self.dates)
+        # self.dates![](icon2.png) = [(1, '1023'), (2, '320')]
         for i, date in self.dates:
-            self.cbx.append(QCheckBox(self).setText(date))
-            self.horizontalLayout.addItem(self.cbx[-1])
+            self.cbx.append(QCheckBox(date, self))
             self.dateButtonGroup.addButton(self.cbx[-1])
+            self.horizontalLayout.addWidget(self.cbx[-1])
         self.CPU_temperatures = cur.execute('''SELECT * FROM CPU''').fetchall()
         self.GPU_temperatures = cur.execute('''SELECT * FROM GPU''').fetchall()
         con.close()
 
-    def show_data(self):
+    def show_data(self, boxname: QCheckBox):
+        name = boxname.text()
+
         con = sqlite3.connect(self.db_name)
         cur = con.cursor()
-        name = self.sender().text()
         CPU_temperatures = cur.execute('SELECT second, temperature FROM CPU WHERE'
                                        ' mon_id = (SELECT id FROM monitoring_ids'
                                        ' WHERE timestamp = ?)', (name,)).fetchall()
+        CPU_temperatures = [i[1] for i in CPU_temperatures]
+        print(CPU_temperatures)
         GPU_temperatures = cur.execute('SELECT second, temperature FROM GPU WHERE'
                                        ' mon_id = (SELECT id FROM monitoring_ids'
                                        ' WHERE timestamp = ?)', (name,)).fetchall()
+        GPU_temperatures = [i[1] for i in GPU_temperatures]
+        print(GPU_temperatures)
 
         self.CPU_graphicsView.addLegend()
         self.GPU_graphicsView.addLegend()
 
-        self.CPU_graphicsView.plot([i for i in range(len(CPU_temperatures))], CPU_temperatures, pen='r', name=name)
-        self.GPU_graphicsView.plot([i for i in range(len(GPU_temperatures))], CPU_temperatures, pen='g', name=name)
+        self.CPU_graphicsView.plot([i for i in range(len(CPU_temperatures))],
+                                   CPU_temperatures, pen='r', name=name)
+        self.GPU_graphicsView.plot([i for i in range(len(GPU_temperatures))],
+                                   GPU_temperatures, pen='g', name=name, width=3)
 
         con.close()
 

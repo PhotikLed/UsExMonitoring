@@ -47,8 +47,6 @@ class Ui_MainWindow(object):
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
         self.menubar.setObjectName("menubar")
-        self.tools = QtWidgets.QMenu(self.menubar)
-        self.tools.setObjectName("tools")
         self.open = QtWidgets.QMenu(self.menubar)
         self.open.setObjectName("open")
         MainWindow.setMenuBar(self.menubar)
@@ -61,10 +59,8 @@ class Ui_MainWindow(object):
         self.conf.setObjectName("conf")
         self.Smart = QtWidgets.QAction(MainWindow)
         self.Smart.setObjectName("Smart")
-        self.tools.addAction(self.Smart)
         self.open.addAction(self.monitor)
         self.open.addAction(self.conf)
-        self.menubar.addAction(self.tools.menuAction())
         self.menubar.addAction(self.open.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -84,7 +80,6 @@ class Ui_MainWindow(object):
 "программ"))
         self.currentButton.setText(_translate("MainWindow", "Показать информацию\n"
 "о текущем компьютере"))
-        self.tools.setTitle(_translate("MainWindow", "Инструменты"))
         self.open.setTitle(_translate("MainWindow", "Открыть"))
         self.monitor.setText(_translate("MainWindow", "Файл мониторинга"))
         self.conf.setText(_translate("MainWindow", "Файл конфигурации"))

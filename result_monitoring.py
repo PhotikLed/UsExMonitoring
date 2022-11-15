@@ -40,5 +40,5 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Показатели температуры процессора и видеокарты за период"))
         self.label.setText(_translate("Form", "Температура процессора"))
-        self.label_2.setText(_translate("Form", "Температутра видеокарты"))
+        self.label_2.setText(_translate("Form", "Температура видеокарты"))
 from pyqtgraph import PlotWidget
