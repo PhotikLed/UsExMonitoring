@@ -39,3 +39,20 @@ def add_monitoring(time: str, cpu, gpu):
         cur.execute('INSERT INTO GPU (second, temperature, mon_id) VALUES (?, ?, ?)', (*gpu_cond, id))
     con.commit()
     con.close()
+
+
+def get_monitoring_info(database, name):
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    CPU_temperatures = cur.execute('SELECT second, temperature FROM CPU WHERE'
+                                   ' mon_id = (SELECT id FROM monitoring_ids'
+                                   ' WHERE timestamp = ?)', (name,)).fetchall()
+    CPU_temperatures = [i[1] for i in CPU_temperatures]
+    GPU_temperatures = cur.execute('SELECT second, temperature FROM GPU WHERE'
+                                   ' mon_id = (SELECT id FROM monitoring_ids'
+                                   ' WHERE timestamp = ?)', (name,)).fetchall()
+    GPU_temperatures = [i[1] for i in GPU_temperatures]
+
+    con.close()
+
+    return CPU_temperatures, GPU_temperatures

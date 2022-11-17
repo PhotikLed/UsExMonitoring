@@ -2,17 +2,14 @@ import datetime
 import random
 import time
 
-import schedule
 from PyQt5.QtCore import QThread, pyqtSignal
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMessageBox, QDialog, QInputDialog
+from PyQt5.QtWidgets import QWidget
 from pyqt5_plugins.examplebuttonplugin import QtGui
 from cpu_and_gpu_monitoring import Ui_Form
 from PyQt5 import uic
 import sys
-import psutil
 import wmi
 import subprocess
-import sqlite3
 import pythoncom
 
 from db import add_monitoring

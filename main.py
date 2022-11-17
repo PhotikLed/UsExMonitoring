@@ -1,8 +1,5 @@
 import random
-import sys
 
-import pyqtgraph
-import schedule
 import wmi
 import os
 import sys
@@ -14,12 +11,9 @@ import sqlite3
 from PyQt5.QtGui import QColor
 from pyqt5_plugins.examplebuttonplugin import QtGui
 
-from db import init_db
+from db import init_db, get_monitoring_info
 from types_of_DDR import types_of_DDR
-import psutil
-import platform
 from PyQt5 import uic  # Импортируем uic
-import pyqtgraph as pg
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMessageBox, QFileDialog, QInputDialog, QDialog, \
     QCheckBox, QButtonGroup
 from main_us_ex import Ui_MainWindow
@@ -40,8 +34,6 @@ class Helper(QMainWindow, Ui_MainWindow):
         self.installButton.clicked.connect(self.download_user_programs)
         self.monitorButton.clicked.connect(self.boost_dialog)
 
-        # self.monitoringWindow = Monitoring()
-
         self.setWindowIcon(QtGui.QIcon('icon.png'))
         self.conf.triggered.connect(self.open_conf_dialog)
         self.monitor.triggered.connect(self.open_monitor_dialog)
@@ -53,9 +45,9 @@ class Helper(QMainWindow, Ui_MainWindow):
         computer_info = self.computer.Win32_ComputerSystem()[0]
         os_info = self.computer.Win32_OperatingSystem()[0]
         proc_info = self.computer.Win32_Processor()[0]  # About processor
-        print(computer_info)
-        print(proc_info)
-        print(os_info)
+        # print(computer_info)
+        # print(proc_info)
+        # print(os_info)
         proc_name = proc_info.Name
         proc_cores = proc_info.NumberofCores
         proc_threads = proc_info.ThreadCount
@@ -66,7 +58,7 @@ class Helper(QMainWindow, Ui_MainWindow):
         print(gpu_info)
 
         gpu_name = gpu_info.Name
-        gpu_memory = int(gpu_info.AdapterRAM / 10240000)  # Нужно тестить на ПК, а не на ноутбуке
+        gpu_memory = int(gpu_info.AdapterRAM / 10240000)  # Неясно как работает
         monitor_resolution = 'x'.join(map(str,
                                           [gpu_info.CurrentHorizontalResolution, gpu_info.CurrentVerticalResolution]))
 
@@ -90,17 +82,12 @@ class Helper(QMainWindow, Ui_MainWindow):
                            "Потоков: " + str(proc_threads),
                            'Объем кэша второго уровня: ' + str(proc_l2) + ' КБ',
                            'Объем кэша третьего уровня: ' + str(proc_l3) + ' КБ',
-                           '',
                            'Видеокарта: ' + gpu_name,
-                           # 'Объем памяти видеокарты: ' + str(gpu_memory),
                            "Разрешение экрана: " + monitor_resolution,
-                           '',
                            'Объём оперативной памяти: ' + str(system_ram) + " ГБ",
                            'Число планок оперативной памяти: ' + str(ram_count),
                            'Число слотов оперативной памяти: ' + ram_slots,
                            'Тип оперативной памяти: ' + ram_ddr,
-
-                           '',
                            'Название операционной системы: ' + os_name.decode('utf-8'),
                            "Версия операционной системы: " + os_version,
                            'Архитектура операционной системы: ' + os_arch,
@@ -175,7 +162,6 @@ class TimeDialog(QDialog, Ui_Dialog):
         self.buttonBox.accepted.connect(self.window_monitoring)
 
     def window_monitoring(self):
-        # self.monitoringWindow.show()
 
         time = self.min_spinBox.value() * 60 + self.sec_spinBox.value()
 
@@ -197,9 +183,9 @@ class ShowingMonitoring(QWidget, Ui_Form):
         self.dateButtonGroup.buttonClicked.connect(self.show_data)
         self.CPU_graphicsView.addLegend()
         self.GPU_graphicsView.addLegend()
-        self.swap_data()
+        self.swap_dates()
 
-    def swap_data(self):
+    def swap_dates(self):
         con = sqlite3.connect(self.db_name)
         cur = con.cursor()
         self.dates = cur.execute('SELECT * FROM monitoring_ids').fetchall()
@@ -208,23 +194,12 @@ class ShowingMonitoring(QWidget, Ui_Form):
             self.cbx.append(QCheckBox(date, self))
             self.dateButtonGroup.addButton(self.cbx[-1])
             self.horizontalLayout.addWidget(self.cbx[-1])
-        self.CPU_temperatures = cur.execute('''SELECT * FROM CPU''').fetchall()
-        self.GPU_temperatures = cur.execute('''SELECT * FROM GPU''').fetchall()
         con.close()
 
     def show_data(self, boxname: QCheckBox):
         name = boxname.text()
         if boxname.isChecked():
-            con = sqlite3.connect(self.db_name)
-            cur = con.cursor()
-            CPU_temperatures = cur.execute('SELECT second, temperature FROM CPU WHERE'
-                                           ' mon_id = (SELECT id FROM monitoring_ids'
-                                           ' WHERE timestamp = ?)', (name,)).fetchall()
-            CPU_temperatures = [i[1] for i in CPU_temperatures]
-            GPU_temperatures = cur.execute('SELECT second, temperature FROM GPU WHERE'
-                                           ' mon_id = (SELECT id FROM monitoring_ids'
-                                           ' WHERE timestamp = ?)', (name,)).fetchall()
-            GPU_temperatures = [i[1] for i in GPU_temperatures]
+            CPU_temperatures, GPU_temperatures = get_monitoring_info(self.db_name, name)
             CPU_color = random.randint(100, 256), random.randint(100, 256), random.randint(100, 256)
             GPU_color = random.randint(100, 256), random.randint(100, 256), random.randint(100, 256)
 
@@ -235,8 +210,6 @@ class ShowingMonitoring(QWidget, Ui_Form):
 
             self.CPU_boxes[name] = CPU_item
             self.GPU_boxes[name] = GPU_item
-
-            con.close()
 
         else:
             self.CPU_graphicsView.removeItem(self.CPU_boxes[name])
@@ -253,6 +226,7 @@ def except_hook(cls, exception, traceback):
 if __name__ == '__main__':
     init_db()
     app = QApplication(sys.argv)
+    app.setStyle('Fusion')
     ex = Helper()
     ex.show()
     sys.excepthook = except_hook
