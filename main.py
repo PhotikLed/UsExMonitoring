@@ -1,4 +1,7 @@
+import random
 import sys
+
+import pyqtgraph
 import schedule
 import wmi
 import os
@@ -7,6 +10,8 @@ import csv
 import subprocess
 import wget
 import sqlite3
+
+from PyQt5.QtGui import QColor
 from pyqt5_plugins.examplebuttonplugin import QtGui
 
 from db import init_db
@@ -187,16 +192,18 @@ class ShowingMonitoring(QWidget, Ui_Form):
         self.cbx = []
         self.dateButtonGroup = QButtonGroup(self)
         self.dateButtonGroup.setExclusive(False)
+        self.CPU_boxes = {}
+        self.GPU_boxes = {}
         self.dateButtonGroup.buttonClicked.connect(self.show_data)
+        self.CPU_graphicsView.addLegend()
+        self.GPU_graphicsView.addLegend()
         self.swap_data()
-
 
     def swap_data(self):
         con = sqlite3.connect(self.db_name)
         cur = con.cursor()
         self.dates = cur.execute('SELECT * FROM monitoring_ids').fetchall()
         print(self.dates)
-        # self.dates![](icon2.png) = [(1, '1023'), (2, '320')]
         for i, date in self.dates:
             self.cbx.append(QCheckBox(date, self))
             self.dateButtonGroup.addButton(self.cbx[-1])
@@ -207,29 +214,36 @@ class ShowingMonitoring(QWidget, Ui_Form):
 
     def show_data(self, boxname: QCheckBox):
         name = boxname.text()
+        if boxname.isChecked():
+            con = sqlite3.connect(self.db_name)
+            cur = con.cursor()
+            CPU_temperatures = cur.execute('SELECT second, temperature FROM CPU WHERE'
+                                           ' mon_id = (SELECT id FROM monitoring_ids'
+                                           ' WHERE timestamp = ?)', (name,)).fetchall()
+            CPU_temperatures = [i[1] for i in CPU_temperatures]
+            GPU_temperatures = cur.execute('SELECT second, temperature FROM GPU WHERE'
+                                           ' mon_id = (SELECT id FROM monitoring_ids'
+                                           ' WHERE timestamp = ?)', (name,)).fetchall()
+            GPU_temperatures = [i[1] for i in GPU_temperatures]
+            CPU_color = random.randint(100, 256), random.randint(100, 256), random.randint(100, 256)
+            GPU_color = random.randint(100, 256), random.randint(100, 256), random.randint(100, 256)
 
-        con = sqlite3.connect(self.db_name)
-        cur = con.cursor()
-        CPU_temperatures = cur.execute('SELECT second, temperature FROM CPU WHERE'
-                                       ' mon_id = (SELECT id FROM monitoring_ids'
-                                       ' WHERE timestamp = ?)', (name,)).fetchall()
-        CPU_temperatures = [i[1] for i in CPU_temperatures]
-        print(CPU_temperatures)
-        GPU_temperatures = cur.execute('SELECT second, temperature FROM GPU WHERE'
-                                       ' mon_id = (SELECT id FROM monitoring_ids'
-                                       ' WHERE timestamp = ?)', (name,)).fetchall()
-        GPU_temperatures = [i[1] for i in GPU_temperatures]
-        print(GPU_temperatures)
+            CPU_item = self.CPU_graphicsView.plot([i for i in range(len(CPU_temperatures))],
+                                                  CPU_temperatures, pen=QColor(*CPU_color), name=name)
+            GPU_item = self.GPU_graphicsView.plot([i for i in range(len(GPU_temperatures))],
+                                                  GPU_temperatures, pen=QColor(*GPU_color), name=name)
 
-        self.CPU_graphicsView.addLegend()
-        self.GPU_graphicsView.addLegend()
+            self.CPU_boxes[name] = CPU_item
+            self.GPU_boxes[name] = GPU_item
 
-        self.CPU_graphicsView.plot([i for i in range(len(CPU_temperatures))],
-                                   CPU_temperatures, pen='r', name=name)
-        self.GPU_graphicsView.plot([i for i in range(len(GPU_temperatures))],
-                                   GPU_temperatures, pen='g', name=name, width=3)
+            con.close()
 
-        con.close()
+        else:
+            self.CPU_graphicsView.removeItem(self.CPU_boxes[name])
+            self.GPU_graphicsView.removeItem(self.GPU_boxes[name])
+
+            del self.CPU_boxes[name]
+            del self.GPU_boxes[name]
 
 
 def except_hook(cls, exception, traceback):
