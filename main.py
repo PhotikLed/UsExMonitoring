@@ -10,8 +10,10 @@ import sqlite3
 
 from PyQt5.QtGui import QColor
 from pyqt5_plugins.examplebuttonplugin import QtGui
+from pyqtgraph import mkPen, mkColor
 
 from db import init_db, get_monitoring_info
+from style_graphic import set_axis, add_legend
 from types_of_DDR import types_of_DDR
 from PyQt5 import uic  # Импортируем uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMessageBox, QFileDialog, QInputDialog, QDialog, \
@@ -162,7 +164,6 @@ class TimeDialog(QDialog, Ui_Dialog):
         self.buttonBox.accepted.connect(self.window_monitoring)
 
     def window_monitoring(self):
-
         time = self.min_spinBox.value() * 60 + self.sec_spinBox.value()
 
         self.mon = Monitoring(time)
@@ -173,6 +174,8 @@ class ShowingMonitoring(QWidget, Ui_Form):
     def __init__(self, db_name):
         super().__init__()
         self.setupUi(self)
+        set_axis(self)
+        add_legend(self)
         self.setWindowIcon(QtGui.QIcon('icon2.png'))
         self.db_name = db_name
         self.cbx = []
@@ -181,8 +184,7 @@ class ShowingMonitoring(QWidget, Ui_Form):
         self.CPU_boxes = {}
         self.GPU_boxes = {}
         self.dateButtonGroup.buttonClicked.connect(self.show_data)
-        self.CPU_graphicsView.addLegend()
-        self.GPU_graphicsView.addLegend()
+
         self.swap_dates()
 
     def swap_dates(self):
@@ -200,13 +202,17 @@ class ShowingMonitoring(QWidget, Ui_Form):
         name = boxname.text()
         if boxname.isChecked():
             CPU_temperatures, GPU_temperatures = get_monitoring_info(self.db_name, name)
-            CPU_color = random.randint(100, 256), random.randint(100, 256), random.randint(100, 256)
-            GPU_color = random.randint(100, 256), random.randint(100, 256), random.randint(100, 256)
+            CPU_color = QColor(random.randint(10, 256), random.randint(180, 256), random.randint(10, 256))
+            GPU_color = QColor(random.randint(10, 256), random.randint(180, 256), random.randint(10, 256))
 
             CPU_item = self.CPU_graphicsView.plot([i for i in range(len(CPU_temperatures))],
-                                                  CPU_temperatures, pen=QColor(*CPU_color), name=name)
+                                                  CPU_temperatures,
+                                                  pen=mkPen(color=CPU_color, width=2),
+                                                  name=name)
             GPU_item = self.GPU_graphicsView.plot([i for i in range(len(GPU_temperatures))],
-                                                  GPU_temperatures, pen=QColor(*GPU_color), name=name)
+                                                  GPU_temperatures,
+                                                  pen=mkPen(color=GPU_color, width=2),
+                                                  name=name)
 
             self.CPU_boxes[name] = CPU_item
             self.GPU_boxes[name] = GPU_item

@@ -5,6 +5,8 @@ import time
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtWidgets import QWidget
 from pyqt5_plugins.examplebuttonplugin import QtGui
+from pyqtgraph import mkPen
+
 from cpu_and_gpu_monitoring import Ui_Form
 from PyQt5 import uic
 import sys
@@ -13,6 +15,7 @@ import subprocess
 import pythoncom
 
 from db import add_monitoring
+from style_graphic import set_axis
 
 
 class Monitoring(QWidget, Ui_Form):
@@ -21,6 +24,8 @@ class Monitoring(QWidget, Ui_Form):
         self.parameters = None
 
         self.setupUi(self)
+        set_axis(self)
+
         self.time = time
         self.thread = Finder(self.time)
         self.thread.start()
@@ -40,8 +45,10 @@ class Monitoring(QWidget, Ui_Form):
     def update_data(self):
         self.CPU_graphicsView.clear()
         self.GPU_graphicsView.clear()
-        self.CPU_graphicsView.plot([i for i in range(len(self.cpu_graphic))], self.cpu_graphic, pen='g')
-        self.GPU_graphicsView.plot([i for i in range(len(self.gpu_graphic))], self.gpu_graphic, pen='r')
+        self.CPU_graphicsView.plot([i for i in range(len(self.cpu_graphic))], self.cpu_graphic,
+                                   pen=mkPen(color='g', width=2, cosmetic=True))
+        self.GPU_graphicsView.plot([i for i in range(len(self.gpu_graphic))], self.gpu_graphic,
+                                   pen=mkPen(color='r', width=2, cosmetic=True))
 
     def save_data(self):
         t = str(datetime.datetime.now())
@@ -59,7 +66,7 @@ class Finder(QThread):
         self.time = time
 
     def run(self):
-        # pythoncom.CoInitialize()
+        # pythoncom.CoInitialize() Оно не работает
         # command = r'Start-Process -WindowStyle hidden ' \
         #           r'"C:\Users\sotka\PycharmProjects\UeXDiagnoSYS\OpenHardwareMonitor\OpenHardwareMonitor" '
         # subprocess.Popen(command)
