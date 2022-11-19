@@ -83,7 +83,7 @@ class Finder(QThread):
         # except:
         #     gpu_temperature = 0
 
-        while time.time() - start_time < self.time:
+        while time.time() - 1.5 - start_time < self.time:
             # cpu_temperature = []
             # w = wmi.WMI(namespace="OpenHardwareMonitor")
             # temperature_infos = w.Sensor()
