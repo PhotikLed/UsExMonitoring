@@ -84,12 +84,15 @@ class Helper(QMainWindow, Ui_MainWindow):
                            "Потоков: " + str(proc_threads),
                            'Объем кэша второго уровня: ' + str(proc_l2) + ' КБ',
                            'Объем кэша третьего уровня: ' + str(proc_l3) + ' КБ',
+                           ''
                            'Видеокарта: ' + gpu_name,
                            "Разрешение экрана: " + monitor_resolution,
+                           ''
                            'Объём оперативной памяти: ' + str(system_ram) + " ГБ",
                            'Число планок оперативной памяти: ' + str(ram_count),
                            'Число слотов оперативной памяти: ' + ram_slots,
                            'Тип оперативной памяти: ' + ram_ddr,
+                           ''
                            'Название операционной системы: ' + os_name.decode('utf-8'),
                            "Версия операционной системы: " + os_version,
                            'Архитектура операционной системы: ' + os_arch,
@@ -135,22 +138,28 @@ class Helper(QMainWindow, Ui_MainWindow):
                                            f' и установите все программы в ней')
 
     def open_conf_dialog(self):
-        fname = QFileDialog.getOpenFileName(self, 'Выберите файл конфигурации', '',
+        try:
+            fname = QFileDialog.getOpenFileName(self, 'Выберите файл конфигурации', '',
                                             'Текстовый файл (*.txt);;')[0]
-        self.current_moment.clear()
-        with open(fname, encoding='utf-8') as conf_file:
-            reader = conf_file.readlines()
-            for line in reader:
-                self.current_moment.appendPlainText(line.rstrip('\n'))
-            self.label.setText('Информация о компьютере пользователя')
-        self.currentButton.setVisible(True)
+            self.current_moment.clear()
+            with open(fname, encoding='utf-8') as conf_file:
+                reader = conf_file.readlines()
+                for line in reader:
+                    self.current_moment.appendPlainText(line.rstrip('\n'))
+                self.label.setText('Информация о компьютере пользователя')
+            self.currentButton.setVisible(True)
+        except Exception:
+            pass
 
     def open_monitor_dialog(self):
-        fname = QFileDialog.getOpenFileName(self, 'Выберите файл мониторинга', '',
+        try:
+            fname = QFileDialog.getOpenFileName(self, 'Выберите файл мониторинга', '',
                                             'База данных (*.db);;')[0]
-        print(fname)
-        self.show_mon = ShowingMonitoring(fname)
-        self.show_mon.show()
+            print(fname)
+            self.show_mon = ShowingMonitoring(fname)
+            self.show_mon.show()
+        except Exception:
+            pass
 
     def boost_dialog(self):
         self.dialog = TimeDialog()
