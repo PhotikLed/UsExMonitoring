@@ -13,11 +13,11 @@ ___
 
 ## Демо-фото
 Основное окно
-![img_5.png](img_5.png)
+![img_5.png](readme_photos/img_5.png)
 Отрисовка мониторинга
-![img_6.png](img_6.png)
+![img_6.png](readme_photos/img_6.png)
 Сравнение мониторингов по датам
-![img_7.png](img_7.png)
+![img_7.png](readme_photos/img_7.png)
 
 ## Используемые технологии
 В основе графического интерфейса лежит PyQT5.
@@ -35,7 +35,7 @@ link: https://openhardwaremonitor.org
 Для запуска из исходников должна быть скачана
 программа OpenHardwareMonitor.
 Папка с программой должна лежать рядом со всеми файлами.
-![img_8.png](img_8.png)
+![img_8.png](readme_photos/img_8.png)
 
 Запускать main.py.
 
