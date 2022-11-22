@@ -57,7 +57,7 @@ class Helper(QMainWindow, Ui_MainWindow):
         proc_l3 = proc_info.L3CacheSize
 
         gpu_info = self.computer.Win32_VideoController()[0]  # About GPU
-        print(gpu_info)
+        # print(gpu_info)
 
         gpu_name = gpu_info.Name
         gpu_memory = int(gpu_info.AdapterRAM / 10240000)  # Неясно как работает
@@ -200,7 +200,7 @@ class ShowingMonitoring(QWidget, Ui_Form):
         con = sqlite3.connect(self.db_name)
         cur = con.cursor()
         self.dates = cur.execute('SELECT * FROM monitoring_ids').fetchall()
-        print(self.dates)
+        # print(self.dates)
         for i, date in self.dates:
             self.cbx.append(QCheckBox(date, self))
             self.dateButtonGroup.addButton(self.cbx[-1])
