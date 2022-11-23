@@ -29,10 +29,10 @@ def add_monitoring(time: str, cpu, gpu):
     con = sqlite3.connect(DB_NAME)
     cur = con.cursor()
     time = ':'.join(time.split(':')[:2])
-    print(time)
+    # print(time)
     cur.execute('INSERT INTO monitoring_ids (timestamp) VALUES (?)', (time,))
     id = cur.execute('SELECT * FROM monitoring_ids WHERE timestamp = ?', (time,)).fetchone()[0]
-    print(id)
+    # print(id)
     for cpu_cond in enumerate(cpu, 1):
         cur.execute('INSERT INTO CPU (second, temperature, mon_id) VALUES (?, ?, ?)', (*cpu_cond, id))
     for gpu_cond in enumerate(gpu, 1):

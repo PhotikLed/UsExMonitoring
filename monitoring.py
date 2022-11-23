@@ -46,9 +46,9 @@ class Monitoring(QWidget, Ui_Form):
         self.CPU_graphicsView.clear()
         self.GPU_graphicsView.clear()
         self.CPU_graphicsView.plot([i for i in range(len(self.cpu_graphic))], self.cpu_graphic,
-                                   pen=mkPen(color='g', width=2, cosmetic=True))
+                                   pen=mkPen(color='g', width=2))
         self.GPU_graphicsView.plot([i for i in range(len(self.gpu_graphic))], self.gpu_graphic,
-                                   pen=mkPen(color='r', width=2, cosmetic=True))
+                                   pen=mkPen(color='r', width=2))
 
     def save_data(self):
         t = str(datetime.datetime.now())
@@ -70,7 +70,7 @@ class Finder(QThread):
         # command = r'Start-Process -WindowStyle hidden ' \
         #           r'"C:\Users\sotka\PycharmProjects\UeXDiagnoSYS\OpenHardwareMonitor\OpenHardwareMonitor" '
         # subprocess.Popen(command)
-        print('start monitoring')
+        # print('start monitoring')
         start_time = time.time()
         # gpu_temperature = 0
         # try:
@@ -102,9 +102,9 @@ class Finder(QThread):
             cpu_temperature = random.randint(40, 100)
             gpu_temperature = random.randint(40, 100)
             self.sinout.emit(cpu_temperature, gpu_temperature)
-            print('emit value')
+            # print('emit value')
             time.sleep(1)
-        print('end monitoring')
+        # print('end monitoring')
 
 
 def except_hook(cls, exception, traceback):

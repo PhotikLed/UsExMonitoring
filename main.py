@@ -155,7 +155,7 @@ class Helper(QMainWindow, Ui_MainWindow):
         try:
             fname = QFileDialog.getOpenFileName(self, 'Выберите файл мониторинга', '',
                                             'База данных (*.db);;')[0]
-            print(fname)
+            # print(fname)
             self.show_mon = ShowingMonitoring(fname)
             self.show_mon.show()
         except Exception:
